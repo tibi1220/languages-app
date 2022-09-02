@@ -1,0 +1,157 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+// Main entity, stores user and all crucial data
+model User {
+  // Serial
+  id            Int            @id @default(autoincrement())
+  // Basic data
+  email         String         @unique
+  username      String         @unique
+  createdAt     DateTime       @default(now()) @map("created_at")
+  password      String
+  sessionId     Int            @default(0) @map("session_id")
+  // Imaginary connecting fields
+  profile       Profile?
+  languages     Language[]
+  subscriptions Subscription[]
+  posts         Post[]
+  postVotes     PostVote[]
+  comments      Comment[]
+  commentVote   CommentVote[]
+
+  @@map("user")
+}
+
+// Linked to the User, contains user specific data (TODO: like settings etc, bio)
+model Profile {
+  // Personal data - TODO: add more functionality
+  bio    String?
+  // Real connecting fields
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @id @map("user_id")
+
+  @@map("profile")
+}
+
+// Subreddit like entity, created by the User
+model Language {
+  // Serial
+  id            Int            @id @default(autoincrement())
+  // Basic info - TODO: add more functionality
+  name          String         @unique
+  createdAt     DateTime       @default(now()) @map("created_at")
+  // Real connecting fields
+  user          User           @relation(fields: [userId], references: [id])
+  userId        Int            @map("user_id")
+  // Imaginary connecting fields
+  posts         Post[]
+  subscriptions Subscription[]
+
+  @@map("language")
+}
+
+// Many to Many Relationship - Connects User and Language
+model Subscription {
+  // Real connecting fields
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int      @map("user_id")
+  language   Language @relation(fields: [languageId], references: [id])
+  languageId Int      @map("language_id")
+
+  // userId and languageId combionation must be unique
+  @@id([userId, languageId])
+  @@map("subscription")
+}
+
+// Created by the User
+model Post {
+  // Serial
+  id         Int        @id @default(autoincrement())
+  // Basic info
+  createdAt  DateTime   @default(now()) @map("created_at")
+  editedAt   DateTime?  @map("edited_at")
+  title      String
+  content    String
+  // Real connecting fields
+  user       User       @relation(fields: [userId], references: [id])
+  userId     Int        @map("user_id")
+  language   Language   @relation(fields: [languageId], references: [id])
+  languageId Int        @map("language_id")
+  // Imaginary connecting fields
+  postVotes  PostVote[]
+  postEdits  PostEdit[]
+  comments   Comment[]
+
+  @@map("post")
+}
+
+// If post is edited, all modifications go here
+model PostEdit {
+  // Serial
+  id        Int      @id @default(autoincrement())
+  // Basic info
+  createdAt DateTime @default(now()) @map("created_at")
+  title     String
+  content   String
+  // Real connecting fields
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int      @map("post_id")
+
+  @@map("post_edit")
+}
+
+// Up or Downvote casted by the User on a Post
+model PostVote {
+  // Basic info
+  value  Int  @db.SmallInt
+  // Real connecting fields
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int  @map("post_id")
+
+  // userIf and postId combination must be unique
+  @@id([userId, postId])
+  @@map("post_vote")
+}
+
+// Created by the user, cannot be changed
+model Comment {
+  // Serial
+  id           Int           @id @default(autoincrement())
+  // Basic info
+  createdAt    DateTime      @default(now()) @map("created_at")
+  content      String
+  // Real connecting fields
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int           @map("user_id")
+  post         Post          @relation(fields: [postId], references: [id])
+  postId       Int           @map("post_id")
+  // Imaginary connecting fields
+  commentVotes CommentVote[]
+
+  @@map("comment")
+}
+
+// Up or Downvote casted by the User on a Comment
+model CommentVote {
+  // Basic info
+  value     Int     @db.SmallInt
+  // Real connecting fields
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @map("user_id")
+  comment   Comment @relation(fields: [commentId], references: [id])
+  commentId Int     @map("comment_id")
+
+  // userId and commentId combionation must be unique
+  @@id([userId, commentId])
+  @@map("comment_vote")
+}

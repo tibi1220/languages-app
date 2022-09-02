@@ -1,0 +1,64 @@
+┌────────────────────┬────────┬─────────┬──────────────────────────────────────────────────────────┐
+│ ROUTE              │ METHOD │ TOKEN   │ ACTION                                                   │
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /                  │  GET   │ none    │ Hello World!                                             │
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /aut               │        │         │                                                          │
+│   /register        │  POST  │ access  │ Register User              { email, username, password } │ done
+│   /login           │  POST  │ none    │ Login User                         { username, password} │ done
+│   /refresh         │  POST  │ refresh │ Refresh access token                                 { } │ done
+│   /revoke          │  POST  │ access  │ Revoke refresh token                        { password } │ done
+│   /delete          │  DEL   │ access  │ Delete User                                 { password } │ TODO
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /user              │        │         │                                                          │
+│   /available       │        │         │                                                          │
+│     /email         │        │         │                                                          │
+│       /:email      │  GET   │ none    │ Check if email is available                              │ done
+│     /username      │        │         │                                                          │
+│       /:username   │  GET   │ none    │ Check if username is available                           │ done
+│   /search          │        │         │                                                          │
+│     /:username     │  GET   │ none    │ Search User by name                     ?skip=0 ?take=10 │ done
+│   /username        │        │         │                                                          │
+│     /:username     │  GET   │ none    │ Get User by name                                         │ done
+│   /:userId         │  GET   │ none    │ Get User details                                         │ done
+│     /karma         │  GET   │ none    │ Get User karma (post, comment, sum)                      │ done
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /language          │        │         │                                                          │
+│   /create          │  POST  │ access  │ Create new Language                             { name } │ done
+│   /available       │        │         │                                                          │
+│     /:name         │  GET   │ none    │ Check if Language name is available                      │ done
+│   /name            │        │         │                                                          │
+│     /:name         │  GET   │ no|acc  │ Get Language by name                                     │ done
+│   /search          │        │         │                                                          │
+│     /:name         │  GET   │ no|acc  │ Search Language by name                 ?skip=0 ?take=10 │ done
+│   /:languageId     │  GET   │ no|acc  │ Get detailed Language by id                              │ done
+│     /delete        │  DEL   │ access  │ Delete own Language                                      │ TODO
+│     /subscribe     │  G|P   │ access  │ Get own | Cast subscribtion           { value: boolean } │ done
+│     /post          │        │         │                                                          │
+│       /create      │  POST  │ access  │ Create new Post             { title, content: markdown } │ done
+│       /recent      │  GET   │ no|acc  │ Get recent Posts          ?body ?skip ?take ?from ?until │ done
+│       /top         │  GET   │ no|acc  │ Get top Posts               ?b=true ?s=0 ?t=10 ?f=0 ?u=0 │ done
+│       /search      │        │         │                                                          │
+│         /:string   │  GET   │ no|acc  │ Search Posts   ?title=true ?content=false ?b ?s ?t ?f ?u │ done
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /post              │        │         │                                                          │
+│   /:postId         │  GET   │ no|acc  │ Get detailed Post by id                                  │ done
+│     /edit          │        │         │                                                          │
+│       /create      │  POST  │ access  │ Edit post                             { title, content } │ done
+│       /history     │  GET   │ none    │ Get recent PostEdits                  ?b=true ?s=0 ?t=10 │ done
+│     /vote          │  G|P   │ access  │ Get own | Cast PostVote              { value: (-1|0|1) } │ done
+│     /delete        │  DEL   │ access  │ Delete Post                                              │ TODO
+│     /comment       │        │         │                                                          │
+│       /create      │  POST  │ access  │ Create new Comment                           { content } │ done
+│       /recent      │  GET   │ no|acc  │ Get recent Comments         ?b=true ?s=0 ?t=10 ?f=0 ?u=0 │ done
+│       /top         │  GET   │ no|acc  │ Get top Comments            ?b=true ?s=0 ?t=10 ?f=0 ?u=0 │ done
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /comment           │        │         │                                                          │
+│   /:commentId      │  GET   │ no|acc  │ Get detailed Comment by id                               │ done
+│     /vote          │  G|P   │ access  │ Get own | Cast CommentVote           { value: (-1|0|1) } │ done
+│     /delete        │  DEL   │ access  │ Delete own Comment                                       │ TODO
+├────────────────────┼────────┼─────────┼──────────────────────────────────────────────────────────┤
+│ /edit              │        │         │                                                          │
+│   /:editId         │  GET   │ none    │ Get PostEdit by id                                       │ done
+│     /revert        │  POST  │ access  │ Revert PostEdit                                          │ done
+└────────────────────┴────────┴─────────┴──────────────────────────────────────────────────────────┘ 
